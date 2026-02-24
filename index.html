@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OfferZone - Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+            min-height: 100vh;
+            padding: 20px;
+            padding-bottom: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            display: flex;
+            gap: 30px;
+            max-width: 1200px;
+            width: 100%;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .login-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #FF6B00 0%, #FF8533 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .logo-text {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .logo-text .offer {
+            color: #333;
+        }
+
+        .logo-text .zone {
+            color: #FF6B00;
+        }
+
+        .illustration {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #fff5f0 0%, #ffe8d6 100%);
+            border-radius: 12px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .illustration::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200"><rect fill="%23FF6B00" opacity="0.1" width="400" height="200"/><circle fill="%23FF6B00" opacity="0.15" cx="100" cy="50" r="30"/><circle fill="%23FF6B00" opacity="0.15" cx="300" cy="150" r="40"/></svg>') no-repeat center;
+            background-size: cover;
+        }
+
+        .illustration-icon {
+            font-size: 80px;
+            opacity: 0.3;
+            color: #FF6B00;
+        }
+
+        .card-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .input-group {
+            width: 100%;
+            margin-bottom: 25px;
+        }
+
+        .mobile-input-container {
+            display: flex;
+            width: 100%;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .mobile-input-container:focus-within {
+            border-color: #FF6B00;
+            box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.1);
+        }
+
+        .country-code {
+            background: #f8f8f8;
+            padding: 15px 18px;
+            border-right: 1.5px solid #e0e0e0;
+            font-weight: 500;
+            color: #666;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+        }
+
+        .mobile-input {
+            flex: 1;
+            padding: 15px 18px;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            font-family: 'Poppins', sans-serif;
+            color: #333;
+        }
+
+        .mobile-input::placeholder {
+            color: #999;
+        }
+
+        .otp-button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #FF6B00 0%, #FF8533 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(255, 107, 0, 0.3);
+        }
+
+        .otp-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+        }
+
+        .otp-button:hover {
+            background: linear-gradient(135deg, #e55a00 0%, #e6731a 100%);
+            box-shadow: 0 6px 20px rgba(255, 107, 0, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .otp-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 10px rgba(255, 107, 0, 0.3);
+        }
+
+        .otp-button:active::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .signup-link {
+            margin-top: 25px;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .signup-link a {
+            color: #FF6B00;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .signup-link a:hover {
+            color: #e55a00;
+            text-decoration: underline;
+        }
+
+        /* Bottom Navigation Bar */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.08);
+            padding: 12px 0;
+            z-index: 1000;
+            display: none;
+        }
+
+        .nav-items {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            flex: 1;
+            padding: 8px;
+        }
+
+        .nav-item-icon {
+            font-size: 22px;
+            color: #999;
+            transition: color 0.3s ease;
+        }
+
+        .nav-item-label {
+            font-size: 11px;
+            color: #999;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-item.active .nav-item-icon,
+        .nav-item.active .nav-item-label {
+            color: #FF6B00;
+        }
+
+        .nav-item:hover .nav-item-icon,
+        .nav-item:hover .nav-item-label {
+            color: #FF6B00;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+                padding-bottom: 100px;
+            }
+
+            .container {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .login-card {
+                padding: 30px 25px;
+                max-width: 100%;
+            }
+
+            .logo-text {
+                font-size: 24px;
+            }
+
+            .illustration {
+                height: 160px;
+            }
+
+            .card-title {
+                font-size: 20px;
+            }
+
+            .bottom-nav {
+                display: block;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .bottom-nav {
+                display: none;
+            }
+        }
+
+        /* Animation for page load */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-card {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .login-card:nth-child(2) {
+            animation-delay: 0.2s;
+            animation-fill-mode: both;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Customer Login Card -->
+        <div class="login-card">
+            <div class="logo">
+                <div class="logo-icon">🛒</div>
+                <div class="logo-text">
+                    <span class="offer">Offer</span><span class="zone">Zone</span>
+                </div>
+            </div>
+            <div class="illustration">
+                <div class="illustration-icon">🛒</div>
+            </div>
+            <h2 class="card-title">Customer Login</h2>
+            <div class="input-group">
+                <div class="mobile-input-container">
+                    <div class="country-code">+91</div>
+                    <input type="tel" class="mobile-input" placeholder="Enter your mobile number" maxlength="10">
+                </div>
+            </div>
+            <button class="otp-button" onclick="window.location.href='index1.html'">Get OTP</button>
+            <div class="signup-link">
+                Don't have an account? <a href="#">Sign Up</a>
+            </div>
+        </div>
+
+        <!-- Shop Owner Login Card -->
+        <div class="login-card">
+            <div class="logo">
+                <div class="logo-icon">🛒</div>
+                <div class="logo-text">
+                    <span class="offer">Offer</span><span class="zone">Zone</span>
+                </div>
+            </div>
+            <div class="illustration">
+                <div class="illustration-icon">🏪</div>
+            </div>
+            <h2 class="card-title">Shop Owner Login</h2>
+            <div class="input-group">
+                <div class="mobile-input-container">
+                    <div class="country-code">+91</div>
+                    <input type="tel" class="mobile-input" placeholder="Enter your mobile number" maxlength="10">
+                </div>
+            </div>
+            <button class="otp-button" onclick="window.location.href='index2.html'">Get OTP</button>
+            <div class="signup-link">
+                Haven't registered your shop? <a href="#">Register Now</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Mobile Navigation -->
+    <nav class="bottom-nav">
+        <div class="nav-items">
+            <div class="nav-item">
+                <div class="nav-item-icon">🏠</div>
+                <div class="nav-item-label">Home</div>
+            </div>
+            <div class="nav-item">
+                <div class="nav-item-icon">📂</div>
+                <div class="nav-item-label">Categories</div>
+            </div>
+            <div class="nav-item">
+                <div class="nav-item-icon">📍</div>
+                <div class="nav-item-label">Nearby Stores</div>
+            </div>
+            <div class="nav-item">
+                <div class="nav-item-icon">🏬</div>
+                <div class="nav-item-label">Stores</div>
+            </div>
+            <div class="nav-item">
+                <div class="nav-item-icon">👤</div>
+                <div class="nav-item-label">Profile</div>
+            </div>
+            <div class="nav-item active">
+                <div class="nav-item-icon">🔐</div>
+                <div class="nav-item-label">Login</div>
+            </div>
+        </div>
+    </nav>
+
+    <script>
+        // Add ripple effect to buttons
+        document.querySelectorAll('.otp-button').forEach(button => {
+            button.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                ripple.classList.add('ripple');
+                
+                this.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        });
+
+        // Mobile number validation
+        document.querySelectorAll('.mobile-input').forEach(input => {
+            input.addEventListener('input', function(e) {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+        });
+    </script>
+
+    <style>
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.6);
+            transform: scale(0);
+            animation: ripple-animation 0.6s ease-out;
+            pointer-events: none;
+        }
+
+        @keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+    </style>
+</body>
+</html>

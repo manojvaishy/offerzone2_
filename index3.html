@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OfferZone - Your Cart</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f5f6f8;
+            min-height: 100vh;
+            padding-bottom: 88px;
+        }
+
+        /* 1. Top Navbar */
+        .navbar {
+            background: #fff;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .nav-left { display: flex; align-items: center; gap: 8px; }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: inherit;
+        }
+        .logo-icon { font-size: 26px; }
+        .logo-text { font-size: 22px; font-weight: 700; color: #FF6B00; }
+        .nav-right { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+        .nav-link {
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            color: #555;
+            transition: color 0.2s;
+        }
+        .nav-link.active { color: #FF6B00; }
+        .nav-link:hover { color: #FF6B00; }
+        .nav-icon-wrap { position: relative; cursor: pointer; }
+        .nav-icon-wrap .icon { font-size: 22px; color: #333; }
+        .nav-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #e53935;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 600;
+            min-width: 16px;
+            height: 16px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 2. Page Title */
+        .page-wrap { max-width: 900px; margin: 0 auto; padding: 24px 20px 20px; }
+        .page-title { font-size: 28px; font-weight: 700; color: #333; margin-bottom: 20px; }
+
+        /* 3. Delivery Info Banner */
+        .delivery-banner {
+            background: #e8f5e9;
+            border-radius: 14px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .delivery-banner .left { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+        .delivery-banner .check { font-size: 24px; }
+        .delivery-banner .text { font-size: 14px; color: #333; }
+        .delivery-banner .arrow { font-size: 18px; color: #666; flex-shrink: 0; cursor: pointer; }
+
+        /* 4. Store Section */
+        .section-head { font-size: 18px; font-weight: 700; color: #333; margin-bottom: 16px; }
+        .store-card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+        .store-header {
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .store-header .left { display: flex; align-items: center; gap: 10px; }
+        .store-header .store-icon { font-size: 24px; }
+        .store-header .name { font-size: 16px; font-weight: 600; color: #333; }
+        .store-header .right { display: flex; align-items: center; gap: 8px; }
+        .store-header .menu { font-size: 20px; color: #666; cursor: pointer; }
+        .store-header .arrow-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #FF6B00;
+            color: #fff;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .tip-banner {
+            background: #fff3e0;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .tip-banner .text { font-size: 13px; color: #333; }
+        .tip-banner .arrow { font-size: 16px; color: #666; cursor: pointer; }
+        .recommended-strip {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            background: #fff;
+            border-bottom: 1px solid #eee;
+        }
+        .recommended-strip .orange-label {
+            background: #FF6B00;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 8px;
+            margin-right: 12px;
+        }
+        .recommended-strip .green-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #e8f5e9;
+            color: #2e7d32;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 8px;
+        }
+        .product-list { padding: 16px 20px; }
+        .cart-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 14px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .cart-item:last-child { border-bottom: none; }
+        .cart-item .thumb {
+            width: 64px;
+            height: 64px;
+            background: #f5f5f5;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+        .cart-item .thumb img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; }
+        .cart-item .info { flex: 1; min-width: 0; }
+        .cart-item .info .name { font-size: 15px; font-weight: 600; color: #333; margin-bottom: 2px; }
+        .cart-item .info .sub { font-size: 12px; color: #888; margin-bottom: 4px; }
+        .cart-item .info .price { font-size: 16px; font-weight: 700; color: #333; }
+        .cart-item .qty-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .cart-item .qty-btn {
+            width: 32px;
+            height: 32px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background: #fff;
+            font-size: 18px;
+            color: #666;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .cart-item .qty-btn:hover { background: #f5f5f5; border-color: #FF6B00; color: #FF6B00; }
+        .cart-item .qty-num { font-size: 15px; font-weight: 600; min-width: 24px; text-align: center; }
+        .cart-item .trash { background: none; border: none; font-size: 20px; cursor: pointer; color: #FF6B00; padding: 4px; }
+        .order-all-row {
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .order-all-row .text { font-size: 15px; font-weight: 600; color: #333; }
+        .order-all-row .btn {
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #FF6B00 0%, #FF8533 100%);
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            font-size: 14px; font-weight: 600; font-family: inherit;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .order-all-row .btn:hover { opacity: 0.95; }
+        .delivery-summary {
+            padding: 16px 20px;
+            background: #fafafa;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .delivery-summary .left { font-size: 14px; color: #555; }
+        .delivery-summary .left .saved { color: #2e7d32; }
+        .delivery-summary .grand { font-size: 20px; font-weight: 700; color: #333; }
+
+        /* 5. Second store – single product card (Tata Salt style) */
+        .single-store-card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+        .single-store-card .card-title {
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #eee;
+        }
+        .single-store-card .card-title .left { display: flex; align-items: center; gap: 10px; }
+        .single-store-card .card-title .store-icon { font-size: 22px; }
+        .single-store-card .card-title .name { font-size: 16px; font-weight: 600; color: #333; }
+        .single-store-card .card-title .right { display: flex; align-items: center; gap: 8px; }
+        .single-store-card .card-title .menu { font-size: 18px; color: #666; cursor: pointer; }
+        .single-store-card .card-title .arrow-btn {
+            width: 34px; height: 34px;
+            border-radius: 50%;
+            background: #FF6B00;
+            color: #fff;
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .single-product-body {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+        @media (max-width: 600px) { .single-product-body { grid-template-columns: 1fr; } }
+        .single-product-body .left { }
+        .single-product-body .left .pname { font-size: 16px; font-weight: 600; color: #333; margin-bottom: 6px; }
+        .single-product-body .left .price { font-size: 22px; font-weight: 700; color: #333; margin-bottom: 6px; }
+        .single-product-body .left .meta { font-size: 13px; color: #888; margin-bottom: 16px; }
+        .single-product-body .left .img-wrap {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            background: #f5f5f5;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 56px;
+        }
+        .single-product-body .left .img-wrap img { width: 100%; height: 100%; object-fit: contain; border-radius: 14px; }
+        .single-product-body .left .img-wrap .trash-overlay {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(255,107,0,0.9);
+            color: #fff;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .summary-box {
+            background: #f9f9f9;
+            border-radius: 14px;
+            padding: 20px;
+        }
+        .summary-box .row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; color: #555; }
+        .summary-box .row.saved { color: #2e7d32; }
+        .summary-box .grand-row { margin-top: 14px; padding-top: 14px; border-top: 1px solid #eee; font-size: 18px; font-weight: 700; color: #333; display: flex; justify-content: space-between; }
+        .summary-box .grand-row .amt { font-size: 22px; color: #333; }
+        .action-buttons {
+            padding: 20px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .action-buttons .btn-grey {
+            padding: 14px 20px;
+            background: #e0e0e0;
+            color: #333;
+            border: none;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+        }
+        .action-buttons .btn-grey:hover { background: #d0d0d0; }
+        .action-buttons .btn-orange {
+            flex: 1;
+            min-width: 180px;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #FF6B00 0%, #FF8533 100%);
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .action-buttons .btn-orange:hover { opacity: 0.95; }
+
+        /* 6. Bottom Nav */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #fff;
+            box-shadow: 0 -2px 12px rgba(0,0,0,0.08);
+            padding: 12px 0;
+            z-index: 100;
+            display: none;
+        }
+        @media (max-width: 768px) { .bottom-nav { display: block; } }
+        .bottom-nav-inner { display: flex; justify-content: space-around; align-items: center; max-width: 500px; margin: 0 auto; }
+        .bottom-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: #888;
+            font-size: 11px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: color 0.2s;
+            position: relative;
+        }
+        .bottom-nav-item .icon { font-size: 22px; }
+        .bottom-nav-item.active { color: #FF6B00; }
+        .bottom-nav-item .icon-wrap { position: relative; display: inline-block; }
+        .bottom-nav-item .badge {
+            position: absolute;
+            top: -6px;
+            right: -8px;
+            background: #e53935;
+            color: #fff;
+            font-size: 9px;
+            font-weight: 600;
+            min-width: 14px;
+            height: 14px;
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- 1. Top Navbar -->
+    <header class="navbar">
+        <div class="nav-left">
+            <a href="index1.html" class="logo">
+                <span class="logo-icon">🛒</span>
+                <span class="logo-text">OfferZone</span>
+            </a>
+        </div>
+        <nav class="nav-right">
+            <a href="index1.html" class="nav-link active">Home</a>
+            <a href="#" class="nav-link">Categories</a>
+            <a href="#" class="nav-link">Nearby Stores</a>
+            <div class="nav-icon-wrap">
+                <span class="icon">👤</span>
+                <span class="nav-badge">2</span>
+            </div>
+            <div class="nav-icon-wrap">
+                <span class="icon">🔔</span>
+            </div>
+        </nav>
+    </header>
+
+    <div class="page-wrap">
+        <!-- 2. Page Title -->
+        <h1 class="page-title">Your Cart</h1>
+
+        <!-- 3. Delivery Info Banner -->
+        <div class="delivery-banner">
+            <div class="left">
+                <span class="check">✅</span>
+                <span class="text">All items available at Patel Grocery – Get single delivery in 20 mins</span>
+            </div>
+            <span class="arrow">→</span>
+        </div>
+
+        <!-- 4. Store Section – SuperMart (2 items) -->
+        <h2 class="section-head">SuperMart (2 items)</h2>
+        <div class="store-card">
+            <div class="store-header">
+                <div class="left">
+                    <span class="store-icon">🏪</span>
+                    <span class="name">Patel Grocery (2 items)</span>
+                </div>
+                <div class="right">
+                    <span class="menu">⋮</span>
+                    <button type="button" class="arrow-btn">→</button>
+                </div>
+            </div>
+            <div class="tip-banner">
+                <span class="text">Tip: Order all items from Patel Grocery for a single delivery and save ₹20 on delivery charges!</span>
+                <span class="arrow">→</span>
+            </div>
+            <div class="recommended-strip">
+                <span class="orange-label">Patel Grocery</span>
+                <span class="green-badge">✓ Recommended</span>
+            </div>
+            <div class="product-list">
+                <div class="cart-item">
+                    <div class="thumb">🍪</div>
+                    <div class="info">
+                        <div class="name">Parle-G Biscuits - 10 pack</div>
+                        <div class="price">₹10</div>
+                    </div>
+                    <div class="qty-wrap">
+                        <button type="button" class="qty-btn" data-action="minus" data-item="parle">−</button>
+                        <span class="qty-num" id="qty-parle">1</span>
+                        <button type="button" class="qty-btn" data-action="plus" data-item="parle">+</button>
+                    </div>
+                    <button type="button" class="trash" title="Remove">🗑️</button>
+                </div>
+                <div class="cart-item">
+                    <div class="thumb">🧈</div>
+                    <div class="info">
+                        <div class="name">Amul Butter</div>
+                        <div class="sub">500g quantity</div>
+                        <div class="price">₹230</div>
+                    </div>
+                    <div class="qty-wrap">
+                        <button type="button" class="qty-btn" data-action="minus" data-item="amul">−</button>
+                        <span class="qty-num" id="qty-amul">1</span>
+                        <button type="button" class="qty-btn" data-action="plus" data-item="amul">+</button>
+                    </div>
+                    <button type="button" class="trash" title="Remove">🗑️</button>
+                </div>
+            </div>
+            <div class="order-all-row">
+                <span class="text">Order All from Patel Grocery</span>
+                <button type="button" class="btn">Order All from Patel Grocery</button>
+            </div>
+            <div class="delivery-summary">
+                <div class="left">
+                    Delivery Charges: <span class="saved">₹20 saved on delivery</span><br>
+                    Grand Total
+                </div>
+                <span class="grand" id="grandPatel">₹270</span>
+            </div>
+        </div>
+
+        <!-- 5. Second Store – SuperMart (1 item) -->
+        <h2 class="section-head">SuperMart (1 item)</h2>
+        <div class="single-store-card">
+            <div class="card-title">
+                <div class="left">
+                    <span class="store-icon">🛒</span>
+                    <span class="name">Tata Salt (1kg)</span>
+                </div>
+                <div class="right">
+                    <span class="menu">⋮</span>
+                    <button type="button" class="arrow-btn">→</button>
+                </div>
+            </div>
+            <div class="single-product-body">
+                <div class="left">
+                    <div class="pname">Tata Salt 1kg</div>
+                    <div class="price">₹28</div>
+                    <div class="meta">2.5 km | 20 mins</div>
+                    <div class="img-wrap">
+                        <span>🧂</span>
+                        <button type="button" class="trash-overlay" title="Remove">🗑️</button>
+                    </div>
+                </div>
+                <div class="summary-box">
+                    <div class="row">Delivery Charges <span>₹20</span></div>
+                    <div class="row saved">Total <span>₹270 ₹20 saved ✓</span></div>
+                    <div class="grand-row">Grand Total <span class="amt" id="grandTata">₹278</span></div>
+                </div>
+            </div>
+            <div class="action-buttons">
+                <button type="button" class="btn-grey">Remove This Shop</button>
+                <button type="button" class="btn-orange" id="btnCheckout">Proceed to Checkout →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. Mobile Bottom Nav -->
+    <nav class="bottom-nav">
+        <div class="bottom-nav-inner">
+            <a href="index1.html" class="bottom-nav-item active"><span class="icon">🏠</span> Home</a>
+            <a href="#" class="bottom-nav-item"><span class="icon">🛒</span> Categories</a>
+            <a href="#" class="bottom-nav-item"><span class="icon">📍</span> Nearby Stores</a>
+            <a href="#" class="bottom-nav-item"><span class="icon">🏬</span> Stores</a>
+            <a href="#" class="bottom-nav-item profile-wrap">
+                <span class="icon-wrap"><span class="icon">👤</span><span class="badge">2</span></span>
+                Profile
+            </a>
+        </div>
+    </nav>
+
+    <script>
+        (function() {
+            var prices = { parle: 10, amul: 230 };
+            var qtys = { parle: 1, amul: 1 };
+
+            function updatePatelTotal() {
+                var total = qtys.parle * prices.parle + qtys.amul * prices.amul;
+                document.getElementById('grandPatel').textContent = '₹' + total;
+            }
+
+            document.querySelectorAll('.qty-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var item = this.getAttribute('data-item');
+                    var action = this.getAttribute('data-action');
+                    if (!item || !prices[item]) return;
+                    if (action === 'plus') {
+                        qtys[item]++;
+                    } else {
+                        if (qtys[item] <= 1) return;
+                        qtys[item]--;
+                    }
+                    document.getElementById('qty-' + item).textContent = qtys[item];
+                    updatePatelTotal();
+                });
+            });
+
+            document.getElementById('btnCheckout').addEventListener('click', function() {
+                window.location.href = 'checkout.html';
+            });
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OfferZone - Shop from Nearby Stores</title>
+    <!-- Font Awesome for map icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        /* Notification styles */
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 350px;
+        }
+
+        .notification {
+            background: white;
+            border-radius: 14px;
+            padding: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideIn 0.3s ease forwards;
+            border-left: 4px solid #FF6B00;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .notification.offer-notification {
+            background: linear-gradient(135deg, #fff5f0, #fff);
+        }
+
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            background: #FF6B00;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: 700;
+            color: #333;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .notification-message {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .notification-close {
+            color: #999;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 4px;
+            transition: color 0.2s;
+        }
+
+        .notification-close:hover {
+            color: #FF6B00;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: #fff;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .nav-left { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: inherit;
+        }
+        .logo-icon { font-size: 28px; }
+        .logo-text { font-size: 22px; font-weight: 700; }
+        .logo-text .offer { color: #FF6B00; }
+        .logo-text .zone { color: #333; }
+        .location {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #666;
+            font-size: 14px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .location:hover {
+            color: #FF6B00;
+        }
+        .location span { text-decoration: underline; }
+        .nav-center { flex: 1; max-width: 320px; margin: 0 12px; }
+        .search-wrap {
+            display: flex;
+            align-items: center;
+            background: #f5f5f5;
+            border-radius: 14px;
+            padding: 10px 14px;
+            border: 1px solid #eee;
+        }
+        .search-wrap:focus-within { border-color: #FF6B00; box-shadow: 0 0 0 2px rgba(255,107,0,0.15); }
+        .search-wrap input { flex: 1; border: none; background: none; outline: none; font-size: 14px; font-family: inherit; }
+        .nav-right { display: flex; align-items: center; gap: 20px; }
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #333;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .nav-link.offers { color: #FF6B00; }
+        .nav-link:hover { color: #FF6B00; }
+        .cart-wrap {
+            display: inline-block;
+            position: relative;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+        .cart-wrap .icon { font-size: 24px; color: #FF6B00; }
+        .cart-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #e53935;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 600;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+        }
+        .cart-badge.hidden { display: none; }
+
+        /* Hero */
+        .hero {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px 20px 40px;
+        }
+        .hero h1 { font-size: 28px; color: #333; margin-bottom: 8px; font-weight: 700; }
+        .hero .sub { font-size: 16px; color: #666; margin-bottom: 28px; }
+        .hero-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 24px;
+        }
+        .categories {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .cat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .cat-item:hover { transform: translateY(-4px); }
+        .cat-circle {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #fff5f0 0%, #ffe8d6 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 4px 12px rgba(255,107,0,0.15);
+        }
+        .cat-item span { font-size: 13px; color: #555; font-weight: 500; }
+        .hero-illus {
+            width: 220px;
+            height: 140px;
+            background: linear-gradient(135deg, #FF6B00 0%, #FF8533 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            box-shadow: 0 8px 24px rgba(255,107,0,0.25);
+        }
+
+        /* Section common */
+        .section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+        }
+        .section-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .section-head h2 { font-size: 20px; color: #333; font-weight: 700; }
+        .btn-view {
+            background: linear-gradient(135deg, #FF6B00 0%, #FF8533 100%);
+            color: #fff;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-view:hover { transform: translateY(-2px); box-shadow: 0 4px 14px rgba(255,107,0,0.35); }
+        .btn-view:active { transform: translateY(0); }
+
+        /* Offers strip */
+        .offers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+        }
+        @media (max-width: 768px) { .offers-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 400px) { .offers-grid { grid-template-columns: 1fr; } }
+        .offer-card {
+            background: #fff;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            height: 140px;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .offer-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+        .offer-card .bg {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+        }
+        .offer-card .bg img { width: 100%; height: 100%; object-fit: cover; }
+        .offer-card .overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.6) 100%);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+        .offer-card .title { font-size: 20px; font-weight: 700; color: #fff; }
+        .offer-card .sub { font-size: 13px; color: rgba(255,255,255,0.9); }
+
+        /* Products */
+        .filter-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .filter-tabs button {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 500;
+            font-family: inherit;
+            background: #eee;
+            color: #555;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+        .filter-tabs button.active { background: #FF6B00; color: #fff; }
+        .filter-tabs button:hover:not(.active) { background: #e0e0e0; }
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        @media (max-width: 900px) { .products-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 500px) { .products-grid { grid-template-columns: 1fr; } }
+        .product-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 16px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .product-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+        .product-card .name { font-size: 15px; font-weight: 600; color: #333; margin-bottom: 2px; }
+        .product-card .pack { font-size: 12px; color: #888; margin-bottom: 8px; }
+        .product-card .price { font-size: 20px; font-weight: 700; color: #FF6B00; margin-bottom: 12px; }
+        .product-img-wrap {
+            width: 100%;
+            height: 120px;
+            background: #f9f9f9;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            cursor: pointer;
+            overflow: hidden;
+        }
+        .product-img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .product-meta { font-size: 12px; color: #888; margin-bottom: 12px; display: flex; gap: 12px; }
+
+        /* NEW: card actions for map + button */
+        .card-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 8px; /* keep spacing consistent */
+        }
+        .map-btn {
+            width: 45px;
+            height: 45px;
+            background: #fff;
+            border: 2px solid #FF6B00;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FF6B00;
+            transition: 0.3s ease;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+        .map-btn:hover {
+            background: #FF6B00;
+            color: #fff;
+            transform: translateY(-3px);
+        }
+        .map-btn i { font-size: 1.3rem; }
+        .add-btn {
+            flex: 1;
+            padding: 12px;
+            background: linear-gradient(135deg, #FF6B00 0%, #FF8533 100%);
+            border: none;
+            border-radius: 14px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .add-btn:hover { transform: scale(1.02); box-shadow: 0 4px 14px rgba(255,107,0,0.35); }
+        .add-btn:active { transform: scale(0.98); }
+
+        .qty-selector {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 8px 0;
+        }
+        .qty-selector.visible { display: flex; }
+        .qty-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 14px;
+            background: #FF6B00;
+            color: #fff;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .qty-btn:hover { transform: scale(1.1); }
+        .qty-btn:active { transform: scale(0.95); }
+        .qty-num { font-size: 16px; font-weight: 600; color: #333; min-width: 24px; text-align: center; }
+
+        /* Stores */
+        .stores-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        @media (max-width: 900px) { .stores-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 500px) { .stores-grid { grid-template-columns: 1fr; } }
+        .store-card {
+            background: #fff;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+        .store-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+        .store-image {
+            width: 100%;
+            height: 180px;
+            overflow: hidden;
+        }
+        .store-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 14px 14px 0 0;
+            display: block;
+        }
+        .store-card .body {
+            padding: 16px;
+        }
+        .store-card .name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 6px;
+        }
+        .store-card .loc {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        /* Store card actions (map + view shop) */
+        .store-card .card-actions {
+            margin-top: 8px;
+        }
+        .store-card .btn-view {
+            flex: 1;
+            background: linear-gradient(135deg, #FF6B00 0%, #FF8533 100%);
+            color: #fff;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .store-card .btn-view:hover { transform: translateY(-2px); box-shadow: 0 4px 14px rgba(255,107,0,0.35); }
+        .store-card .btn-view:active { transform: translateY(0); }
+
+        /* Bottom nav */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #fff;
+            box-shadow: 0 -2px 12px rgba(0,0,0,0.08);
+            padding: 10px 0;
+            z-index: 100;
+            display: none;
+        }
+        @media (max-width: 768px) { .bottom-nav { display: block; } }
+        .bottom-nav-inner {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .bottom-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            color: #888;
+            font-size: 11px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .bottom-nav-item .icon { font-size: 22px; }
+        .bottom-nav-item.active { color: #FF6B00; }
+        .bottom-nav-item:hover { color: #FF6B00; }
+
+        /* small screen adjustment for card-actions */
+        @media (max-width: 400px) {
+            .card-actions {
+                flex-wrap: wrap;
+            }
+            .map-btn {
+                width: 40px;
+                height: 40px;
+            }
+        }
+
+        /* Offer badge on products */
+        .offer-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #FF6B00;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            z-index: 1;
+        }
+
+        .product-card {
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+    <!-- Notification Container -->
+    <div class="notification-container" id="notificationContainer"></div>
+
+    <header class="navbar">
+        <div class="nav-left">
+            <a href="index1.html" class="logo">
+                <span class="logo-icon">🛒</span>
+                <span class="logo-text"><span class="offer">Offer</span><span class="zone">Zone</span></span>
+            </a>
+            <div class="location" onclick="openGoogleMaps('Ahmedabad, Gujarat')">
+                <i class="fa-solid fa-location-dot"></i>
+                <span>Ahmedabad, Gujarat</span>
+                <i class="fa-solid fa-chevron-down"></i>
+            </div>
+        </div>
+        <div class="nav-center">
+            <div class="search-wrap">
+                <span>🔍</span>
+                <input type="text" placeholder="Search for products...">
+            </div>
+        </div>
+        <div class="nav-right">
+            <a href="#" class="nav-link offers">🎁 Offers</a>
+            <a href="index3.html" class="cart-wrap" id="cartLink">
+                <span class="icon">🛒</span>
+                <span class="cart-badge hidden" id="cartBadge">0</span>
+            </a>
+            <a href="#" class="nav-link">👤 My Account</a>
+        </div>
+    </header>
+
+    <section class="hero">
+        <h1>Shop from Nearby Stores</h1>
+        <p class="sub">Get groceries delivered in minutes!</p>
+        <div class="hero-inner">
+            <div class="categories">
+                <div class="cat-item" onclick="showOfferNotification('Staples')"><div class="cat-circle">🥬</div><span>Staples</span></div>
+                <div class="cat-item" onclick="showOfferNotification('Snacks')"><div class="cat-circle">🍪</div><span>Snacks</span></div>
+                <div class="cat-item" onclick="showOfferNotification('Beverages')"><div class="cat-circle">🥤</div><span>Beverages</span></div>
+                <div class="cat-item" onclick="showOfferNotification('Dairy')"><div class="cat-circle">🥛</div><span>Dairy</span></div>
+                <div class="cat-item" onclick="showOfferNotification('Personal Care')"><div class="cat-circle">🧴</div><span>Personal Care</span></div>
+            </div>
+            <div class="hero-illus">🛵</div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="section-head">
+            <h2>Best Offers in Your Area</h2>
+            <button class="btn-view" onclick="showOfferNotification('All Offers')">View All →</button>
+        </div>
+        <div class="offers-grid">
+            <div class="offer-card" onclick="showOfferNotification('15% OFF on Fresh Vegetables')">
+                <div class="bg"><img src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&q=80" alt="Fresh vegetables"></div>
+                <div class="overlay"><span class="title">15% OFF</span><span class="sub">Fresh Vegetables</span></div>
+            </div>
+            <div class="offer-card" onclick="showOfferNotification('Buy 1 Get 1 Free on Chocolates')">
+                <div class="bg"><img src="https://images.unsplash.com/photo-1606312619070-d48b4b2f2b3a?w=600&q=80" alt="Chocolate"></div>
+                <div class="overlay"><span class="title">Buy 1 Get 1 Free</span><span class="sub">Chocolate Offer</span></div>
+            </div>
+            <div class="offer-card" onclick="showOfferNotification('Save ₹25 on Fresh Fruits')">
+                <div class="bg"><img src="https://images.unsplash.com/photo-1619566636858-adf3ef46400b?w=600&q=80" alt="Fresh fruits"></div>
+                <div class="overlay"><span class="title">Save ₹25</span><span class="sub">on Fruits</span></div>
+            </div>
+            <div class="offer-card" onclick="showOfferNotification('30% OFF on Dairy Products')">
+                <div class="bg"><img src="https://images.unsplash.com/photo-1550583724-b2692b85b150?w=600&q=80" alt="Dairy products"></div>
+                <div class="overlay"><span class="title">30% OFF</span><span class="sub">Dairy Products</span></div>
+            </div>
+            <div class="offer-card" onclick="showOfferNotification('Buy 2 Get 1 Free on Snacks')">
+                <div class="bg"><img src="https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=600&q=80" alt="Snacks"></div>
+                <div class="overlay"><span class="title">Buy 2 Get 1 Free</span><span class="sub">Snacks</span></div>
+            </div>
+            <div class="offer-card" onclick="showOfferNotification('Mega Sale on Fresh Fruits')">
+                <div class="bg"><img src="https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?w=600&q=80" alt="Fruits sale"></div>
+                <div class="overlay"><span class="title">Mega Sale</span><span class="sub">Fresh Fruits</span></div>
+            </div>
+            <div class="offer-card" onclick="showOfferNotification('20% OFF on Household Cleaning')">
+                <div class="bg"><img src="https://images.unsplash.com/photo-1585421514738-01798e348b17?w=600&q=80" alt="Cleaning"></div>
+                <div class="overlay"><span class="title">20% OFF</span><span class="sub">Household Cleaning</span></div>
+            </div>
+            <div class="offer-card" onclick="showOfferNotification('Combo Offer on Personal Care')">
+                <div class="bg"><img src="https://images.unsplash.com/photo-1556228720-195a672e8a03?w=600&q=80" alt="Personal care"></div>
+                <div class="overlay"><span class="title">Combo Offer</span><span class="sub">Personal Care</span></div>
+            </div>
+            <div class="offer-card" onclick="showOfferNotification('Weekend Sale - Grocery Deals')">
+                <div class="bg"><img src="https://images.unsplash.com/photo-1534723452862-4c874018d66d?w=600&q=80" alt="Weekend sale"></div>
+                <div class="overlay"><span class="title">Weekend Sale</span><span class="sub">Grocery Deals</span></div>
+            </div>
+            <div class="offer-card" onclick="showOfferNotification('Flat ₹50 OFF on orders above ₹499')">
+                <div class="bg"><img src="https://images.unsplash.com/photo-1504674900247-0877df9cc84e?w=600&q=80" alt="Breakfast"></div>
+                <div class="overlay"><span class="title">Flat ₹50 OFF</span><span class="sub">Orders Above ₹499</span></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2 class="section-head">Popular Products from Nearby Stores</h2>
+        <div class="filter-tabs">
+            <button class="active">All</button>
+            <button>Best Deals</button>
+            <button>Top Rated</button>
+        </div>
+        <div class="products-grid" id="productsGrid">
+            <!-- Product 1 with offer badge -->
+            <div class="product-card" data-id="1">
+                <span class="offer-badge">15% OFF</span>
+                <div class="name">Britannia Good Day</div>
+                <div class="pack">75g Pack</div>
+                <div class="price">₹30</div>
+                <div class="product-img-wrap" data-product-link="index3.html">
+                    <img src="https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400&q=80" alt="Biscuits cookies pack">
+                </div>
+                <div class="product-meta">
+                    <span onclick="openGoogleMaps('Britannia+Good+Day+Ahmedabad')" style="cursor: pointer;">📍 700m</span> · 
+                    <span>🕐 8 min</span>
+                </div>
+                <div class="card-actions">
+                    <a href="javascript:void(0)" onclick="openGoogleMaps('Britannia+Good+Day+Ahmedabad')" class="map-btn" title="Navigate via Google Maps"><i class="fa-solid fa-location-dot"></i></a>
+                    <button class="add-btn">🛒 Add to Cart</button>
+                </div>
+                <div class="qty-selector"><button type="button" class="qty-btn minus">−</button><span class="qty-num">1</span><button type="button" class="qty-btn plus">+</button></div>
+            </div>
+            <!-- Product 2 with offer badge -->
+            <div class="product-card" data-id="2">
+                <span class="offer-badge">BOGO</span>
+                <div class="name">Nestlé Maggi Masala</div>
+                <div class="pack">70g Pack</div>
+                <div class="price">₹13</div>
+                <div class="product-img-wrap"><img src="https://picsum.photos/seed/noodles/400/300" alt="Instant noodles"></div>
+                <div class="product-meta">
+                    <span onclick="openGoogleMaps('Nestlé+Maggi+Masala+Ahmedabad')" style="cursor: pointer;">📍 1.3 km</span> · 
+                    <span>🕐 15 min</span>
+                </div>
+                <div class="card-actions">
+                    <a href="javascript:void(0)" onclick="openGoogleMaps('Nestlé+Maggi+Masala+Ahmedabad')" class="map-btn" title="Navigate via Google Maps"><i class="fa-solid fa-location-dot"></i></a>
+                    <button class="add-btn">🛒 Add to Cart</button>
+                </div>
+                <div class="qty-selector"><button type="button" class="qty-btn minus">−</button><span class="qty-num">1</span><button type="button" class="qty-btn plus">+</button></div>
+            </div>
+            <!-- Product 3 -->
+            <div class="product-card" data-id="3">
+                <div class="name">Fortune Sunlite Refined Oil</div>
+                <div class="pack">1 Litre</div>
+                <div class="price">₹140</div>
+                <div class="product-img-wrap"><img src="https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=400&q=80" alt="Cooking oil bottle"></div>
+                <div class="product-meta">
+                    <span onclick="openGoogleMaps('Fortune+Sunlite+Refined+Oil+Ahmedabad')" style="cursor: pointer;">📍 2.0 km</span> · 
+                    <span>🕐 20 mins</span>
+                </div>
+                <div class="card-actions">
+                    <a href="javascript:void(0)" onclick="openGoogleMaps('Fortune+Sunlite+Refined+Oil+Ahmedabad')" class="map-btn" title="Navigate via Google Maps"><i class="fa-solid fa-location-dot"></i></a>
+                    <button class="add-btn">🛒 Add to Cart</button>
+                </div>
+                <div class="qty-selector"><button type="button" class="qty-btn minus">−</button><span class="qty-num">1</span><button type="button" class="qty-btn plus">+</button></div>
+            </div>
+            <!-- Product 4 with offer badge -->
+            <div class="product-card" data-id="4">
+                <span class="offer-badge">10% OFF</span>
+                <div class="name">India Gate Basmati Rice</div>
+                <div class="pack">1 kg</div>
+                <div class="price">₹95</div>
+                <div class="product-img-wrap"><img src="https://images.unsplash.com/photo-1586201375761-83865001e31c?w=400&q=80" alt="Rice bag"></div>
+                <div class="product-meta">
+                    <span onclick="openGoogleMaps('India+Gate+Basmati+Rice+Ahmedabad')" style="cursor: pointer;">📍 1.1 km</span> · 
+                    <span>🕐 12 min</span>
+                </div>
+                <div class="card-actions">
+                    <a href="javascript:void(0)" onclick="openGoogleMaps('India+Gate+Basmati+Rice+Ahmedabad')" class="map-btn" title="Navigate via Google Maps"><i class="fa-solid fa-location-dot"></i></a>
+                    <button class="add-btn">🛒 Add to Cart</button>
+                </div>
+                <div class="qty-selector"><button type="button" class="qty-btn minus">−</button><span class="qty-num">1</span><button type="button" class="qty-btn plus">+</button></div>
+            </div>
+            <!-- Product 5 -->
+            <div class="product-card" data-id="5">
+                <div class="name">Aashirvaad Wheat Flour</div>
+                <div class="pack">1 kg</div>
+                <div class="price">₹52</div>
+                <div class="product-img-wrap"><img src="https://picsum.photos/seed/flour/400/300" alt="Wheat flour pack"></div>
+                <div class="product-meta">
+                    <span onclick="openGoogleMaps('Aashirvaad+Wheat+Flour+Ahmedabad')" style="cursor: pointer;">📍 0.9 km</span> · 
+                    <span>🕐 10 min</span>
+                </div>
+                <div class="card-actions">
+                    <a href="javascript:void(0)" onclick="openGoogleMaps('Aashirvaad+Wheat+Flour+Ahmedabad')" class="map-btn" title="Navigate via Google Maps"><i class="fa-solid fa-location-dot"></i></a>
+                    <button class="add-btn">🛒 Add to Cart</button>
+                </div>
+                <div class="qty-selector"><button type="button" class="qty-btn minus">−</button><span class="qty-num">1</span><button type="button" class="qty-btn plus">+</button></div>
+            </div>
+            <!-- Product 6 -->
+            <div class="product-card" data-id="6">
+                <div class="name">Tata Sugar</div>
+                <div class="pack">1 kg</div>
+                <div class="price">₹48</div>
+                <div class="product-img-wrap"><img src="https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?w=400&q=80" alt="Sugar packet"></div>
+                <div class="product-meta">
+                    <span onclick="openGoogleMaps('Tata+Sugar+Ahmedabad')" style="cursor: pointer;">📍 1.5 km</span> · 
+                    <span>🕐 14 min</span>
+                </div>
+                <div class="card-actions">
+                    <a href="javascript:void(0)" onclick="openGoogleMaps('Tata+Sugar+Ahmedabad')" class="map-btn" title="Navigate via Google Maps"><i class="fa-solid fa-location-dot"></i></a>
+                    <button class="add-btn">🛒 Add to Cart</button>
+                </div>
+                <div class="qty-selector"><button type="button" class="qty-btn minus">−</button><span class="qty-num">1</span><button type="button" class="qty-btn plus">+</button></div>
+            </div>
+            <!-- Product 7 -->
+            <div class="product-card" data-id="7">
+                <div class="name">Tata Salt</div>
+                <div class="pack">1 kg</div>
+                <div class="price">₹22</div>
+                <div class="product-img-wrap"><img src="https://images.unsplash.com/photo-1602877924655-8d371a8f0e4f?w=400&q=80" alt="Salt packet"></div>
+                <div class="product-meta">
+                    <span onclick="openGoogleMaps('Tata+Salt+Ahmedabad')" style="cursor: pointer;">📍 800m</span> · 
+                    <span>🕐 9 min</span>
+                </div>
+                <div class="card-actions">
+                    <a href="javascript:void(0)" onclick="openGoogleMaps('Tata+Salt+Ahmedabad')" class="map-btn" title="Navigate via Google Maps"><i class="fa-solid fa-location-dot"></i></a>
+                    <button class="add-btn">🛒 Add to Cart</button>
+                </div>
+                <div class="qty-selector"><button type="button" class="qty-btn minus">−</button><span class="qty-num">1</span><button type="button" class="qty-btn plus">+</button></div>
+            </div>
+            <!-- Product 8 with offer badge -->
+            <div class="product-card" data-id="8">
+                <span class="offer-badge">5% OFF</span>
+                <div class="name">Amul Butter</div>
+                <div class="pack">100g</div>
+                <div class="price">₹55</div>
+                <div class="product-img-wrap"><img src="https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?w=400&q=80" alt="Butter pack"></div>
+                <div class="product-meta">
+                    <span onclick="openGoogleMaps('Amul+Butter+Ahmedabad')" style="cursor: pointer;">📍 1.0 km</span> · 
+                    <span>🕐 11 min</span>
+                </div>
+                <div class="card-actions">
+                    <a href="javascript:void(0)" onclick="openGoogleMaps('Amul+Butter+Ahmedabad')" class="map-btn" title="Navigate via Google Maps"><i class="fa-solid fa-location-dot"></i></a>
+                    <button class="add-btn">🛒 Add to Cart</button>
+                </div>
+                <div class="qty-selector"><button type="button" class="qty-btn minus">−</button><span class="qty-num">1</span><button type="button" class="qty-btn plus">+</button></div>
+            </div>
+            <!-- Product 9 -->
+            <div class="product-card" data-id="9">
+                <div class="name">Amul Taaza Milk</div>
+                <div class="pack">1 L</div>
+                <div class="price">₹58</div>
+                <div class="product-img-wrap"><img src="https://images.unsplash.com/photo-1563636619-e9143da7973b?w=400&q=80" alt="Milk carton"></div>
+                <div class="product-meta">
+                    <span onclick="openGoogleMaps('Amul+Taaza+Milk+Ahmedabad')" style="cursor: pointer;">📍 600m</span> · 
+                    <span>🕐 7 min</span>
+                </div>
+                <div class="card-actions">
+                    <a href="javascript:void(0)" onclick="openGoogleMaps('Amul+Taaza+Milk+Ahmedabad')" class="map-btn" title="Navigate via Google Maps"><i class="fa-solid fa-location-dot"></i></a>
+                    <button class="add-btn">🛒 Add to Cart</button>
+                </div>
+                <div class="qty-selector"><button type="button" class="qty-btn minus">−</button><span class="qty-num">1</span><button type="button" class="qty-btn plus">+</button></div>
+            </div>
+            <!-- Product 10 -->
+            <div class="product-card" data-id="10">
+                <div class="name">Coca-Cola</div>
+                <div class="pack">2 L</div>
+                <div class="price">₹99</div>
+                <div class="product-img-wrap"><img src="https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=400&q=80" alt="Soft drinks bottle"></div>
+                <div class="product-meta">
+                    <span onclick="openGoogleMaps('Coca-Cola+Ahmedabad')" style="cursor: pointer;">📍 1.4 km</span> · 
+                    <span>🕐 13 min</span>
+                </div>
+                <div class="card-actions">
+                    <a href="javascript:void(0)" onclick="openGoogleMaps('Coca-Cola+Ahmedabad')" class="map-btn" title="Navigate via Google Maps"><i class="fa-solid fa-location-dot"></i></a>
+                    <button class="add-btn">🛒 Add to Cart</button>
+                </div>
+                <div class="qty-selector"><button type="button" class="qty-btn minus">−</button><span class="qty-num">1</span><button type="button" class="qty-btn plus">+</button></div>
+            </div>
+            <!-- Product 11 with offer badge -->
+            <div class="product-card" data-id="11">
+                <span class="offer-badge">20% OFF</span>
+                <div class="name">Lay's Classic Chips</div>
+                <div class="pack">52g</div>
+                <div class="price">₹20</div>
+                <div class="product-img-wrap"><img src="https://images.unsplash.com/photo-1566478989037-eec170784d0b?w=400&q=80" alt="Chips packet"></div>
+                <div class="product-meta">
+                    <span onclick="openGoogleMaps('Lay\'s+Classic+Chips+Ahmedabad')" style="cursor: pointer;">📍 900m</span> · 
+                    <span>🕐 8 min</span>
+                </div>
+                <div class="card-actions">
+                    <a href="javascript:void(0)" onclick="openGoogleMaps('Lay\'s+Classic+Chips+Ahmedabad')" class="map-btn" title="Navigate via Google Maps"><i class="fa-solid fa-location-dot"></i></a>
+                    <button class="add-btn">🛒 Add to Cart</button>
+                </div>
+                <div class="qty-selector"><button type="button" class="qty-btn minus">−</button><span class="qty-num">1</span><button type="button" class="qty-btn plus">+</button></div>
+            </div>
+            <!-- Product 12 -->
+            <div class="product-card" data-id="12">
+                <div class="name">Taj Mahal Tea</div>
+                <div class="pack">500g</div>
+                <div class="price">₹285</div>
+                <div class="product-img-wrap"><img src="https://images.unsplash.com/photo-1564890369478-c89ca6d9cde9?w=400&q=80" alt="Tea pack"></div>
+                <div class="product-meta">
+                    <span onclick="openGoogleMaps('Taj+Mahal+Tea+Ahmedabad')" style="cursor: pointer;">📍 1.6 km</span> · 
+                    <span>🕐 16 min</span>
+                </div>
+                <div class="card-actions">
+                    <a href="javascript:void(0)" onclick="openGoogleMaps('Taj+Mahal+Tea+Ahmedabad')" class="map-btn" title="Navigate via Google Maps"><i class="fa-solid fa-location-dot"></i></a>
+                    <button class="add-btn">🛒 Add to Cart</button>
+                </div>
+                <div class="qty-selector"><button type="button" class="qty-btn minus">−</button><span class="qty-num">1</span><button type="button" class="qty-btn plus">+</button></div>
+            </div>
+            <!-- Product 13 -->
+            <div class="product-card" data-id="13">
+                <div class="name">Nescafé Classic</div>
+                <div class="pack">200g</div>
+                <div class="price">₹340</div>
+                <div class="product-img-wrap"><img src="https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=400&q=80" alt="Coffee jar"></div>
+                <div class="product-meta">
+                    <span onclick="openGoogleMaps('Nescafé+Classic+Ahmedabad')" style="cursor: pointer;">📍 2.1 km</span> · 
+                    <span>🕐 18 min</span>
+                </div>
+                <div class="card-actions">
+                    <a href="javascript:void(0)" onclick="openGoogleMaps('Nescafé+Classic+Ahmedabad')" class="map-btn" title="Navigate via Google Maps"><i class="fa-solid fa-location-dot"></i></a>
+                    <button class="add-btn">🛒 Add to Cart</button>
+                </div>
+                <div class="qty-selector"><button type="button" class="qty-btn minus">−</button><span class="qty-num">1</span><button type="button" class="qty-btn plus">+</button></div>
+            </div>
+            <!-- Product 14 -->
+            <div class="product-card" data-id="14">
+                <div class="name">Surf Excel Easy Wash</div>
+                <div class="pack">1 kg</div>
+                <div class="price">₹199</div>
+                <div class="product-img-wrap"><img src="https://images.unsplash.com/photo-1582735689369-4fe89db7114c?w=400&q=80" alt="Detergent pack"></div>
+                <div class="product-meta">
+                    <span onclick="openGoogleMaps('Surf+Excel+Easy+Wash+Ahmedabad')" style="cursor: pointer;">📍 1.7 km</span> · 
+                    <span>🕐 15 min</span>
+                </div>
+                <div class="card-actions">
+                    <a href="javascript:void(0)" onclick="openGoogleMaps('Surf+Excel+Easy+Wash+Ahmedabad')" class="map-btn" title="Navigate via Google Maps"><i class="fa-solid fa-location-dot"></i></a>
+                    <button class="add-btn">🛒 Add to Cart</button>
+                </div>
+                <div class="qty-selector"><button type="button" class="qty-btn minus">−</button><span class="qty-num">1</span><button type="button" class="qty-btn plus">+</button></div>
+            </div>
+            <!-- Product 15 -->
+            <div class="product-card" data-id="15">
+                <div class="name">Dove Shampoo</div>
+                <div class="pack">340 ml</div>
+                <div class="price">₹249</div>
+                <div class="product-img-wrap"><img src="https://images.unsplash.com/photo-1522338243402-2f4c6f31a2e4?w=400&q=80" alt="Shampoo bottle"></div>
+                <div class="product-meta">
+                    <span onclick="openGoogleMaps('Dove+Shampoo+Ahmedabad')" style="cursor: pointer;">📍 1.2 km</span> · 
+                    <span>🕐 12 min</span>
+                </div>
+                <div class="card-actions">
+                    <a href="javascript:void(0)" onclick="openGoogleMaps('Dove+Shampoo+Ahmedabad')" class="map-btn" title="Navigate via Google Maps"><i class="fa-solid fa-location-dot"></i></a>
+                    <button class="add-btn">🛒 Add to Cart</button>
+                </div>
+                <div class="qty-selector"><button type="button" class="qty-btn minus">−</button><span class="qty-num">1</span><button type="button" class="qty-btn plus">+</button></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Shop by Nearby Stores – with real images and map icons -->
+    <section class="section">
+        <div class="section-head">
+            <h2>Shop by Nearby Stores</h2>
+        </div>
+        <div class="stores-grid">
+            <!-- Store 1 -->
+            <div class="store-card">
+                <div class="store-image"><img src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&q=80" alt="Easy Mart"></div>
+                <div class="body">
+                    <div class="name">Easy Mart</div>
+                    <div class="loc" onclick="openGoogleMaps('Easy+Mart+Ahmedabad')" style="cursor: pointer;">📍 1.5 km away · 25 min</div>
+                    <div class="card-actions">
+                        <a href="javascript:void(0)" onclick="openGoogleMaps('Easy+Mart+Ahmedabad')" class="map-btn" title="Navigate via Google Maps"><i class="fa-solid fa-location-dot"></i></a>
+                        <span class="btn-view" onclick="window.location.href='index3.html'">View Shop →</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Store 2 -->
+            <div class="store-card">
+                <div class="store-image"><img src="https://images.unsplash.com/photo-1604719311686-9c9d9c6b3e6b?w=400&q=80" alt="Patel Provision Store"></div>
+                <div class="body">
+                    <div class="name">Patel Provision Store</div>
+                    <div class="loc" onclick="openGoogleMaps('Patel+Provision+Store+Ahmedabad')" style="cursor: pointer;">📍 2.8 km · 12 mins</div>
+                    <div class="card-actions">
+                        <a href="javascript:void(0)" onclick="openGoogleMaps('Patel+Provision+Store+Ahmedabad')" class="map-btn" title="Navigate via Google Maps"><i class="fa-solid fa-location-dot"></i></a>
+                        <span class="btn-view" onclick="window.location.href='index3.html'">View Shop →</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Store 3 -->
+            <div class="store-card">
+                <div class="store-image"><img src="https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=400&q=80" alt="Ashapura Kirana"></div>
+                <div class="body">
+                    <div class="name">Ashapura Kirana</div>
+                    <div class="loc" onclick="openGoogleMaps('Ashapura+Kirana+Ahmedabad')" style="cursor: pointer;">📍 1.2 km away · 20 mins</div>
+                    <div class="card-actions">
+                        <a href="javascript:void(0)" onclick="openGoogleMaps('Ashapura+Kirana+Ahmedabad')" class="map-btn" title="Navigate via Google Maps"><i class="fa-solid fa-location-dot"></i></a>
+                        <span class="btn-view" onclick="window.location.href='index3.html'">View Shop →</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Store 4 -->
+            <div class="store-card">
+                <div class="store-image"><img src="https://images.unsplash.com/photo-1534723452862-4c874018d66d?w=400&q=80" alt="Vikas Grocery"></div>
+                <div class="body">
+                    <div class="name">Vikas Grocery</div>
+                    <div class="loc" onclick="openGoogleMaps('Vikas+Grocery+Ahmedabad')" style="cursor: pointer;">📍 3.0 km · 18 mins</div>
+                    <div class="card-actions">
+                        <a href="javascript:void(0)" onclick="openGoogleMaps('Vikas+Grocery+Ahmedabad')" class="map-btn" title="Navigate via Google Maps"><i class="fa-solid fa-location-dot"></i></a>
+                        <span class="btn-view" onclick="window.location.href='index3.html'">View Shop →</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Store 5 -->
+            <div class="store-card">
+                <div class="store-image"><img src="https://images.unsplash.com/photo-1550989460-0adf9ea622e2?w=400&q=80" alt="Daily Fresh Mart"></div>
+                <div class="body">
+                    <div class="name">Daily Fresh Mart</div>
+                    <div class="loc" onclick="openGoogleMaps('Daily+Fresh+Mart+Ahmedabad')" style="cursor: pointer;">📍 0.8 km away · 10 mins</div>
+                    <div class="card-actions">
+                        <a href="javascript:void(0)" onclick="openGoogleMaps('Daily+Fresh+Mart+Ahmedabad')" class="map-btn" title="Navigate via Google Maps"><i class="fa-solid fa-location-dot"></i></a>
+                        <span class="btn-view" onclick="window.location.href='index3.html'">View Shop →</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Store 6 -->
+            <div class="store-card">
+                <div class="store-image"><img src="https://images.unsplash.com/photo-1588964895597-cfccd6e2dbf9?w=400&q=80" alt="Super Save Store"></div>
+                <div class="body">
+                    <div class="name">Super Save Store</div>
+                    <div class="loc" onclick="openGoogleMaps('Super+Save+Store+Ahmedabad')" style="cursor: pointer;">📍 2.2 km · 15 mins</div>
+                    <div class="card-actions">
+                        <a href="javascript:void(0)" onclick="openGoogleMaps('Super+Save+Store+Ahmedabad')" class="map-btn" title="Navigate via Google Maps"><i class="fa-solid fa-location-dot"></i></a>
+                        <span class="btn-view" onclick="window.location.href='index3.html'">View Shop →</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Store 7 -->
+            <div class="store-card">
+                <div class="store-image"><img src="https://images.unsplash.com/photo-1550583724-b2692b85b150?w=400&q=80" alt="Fresh Choice Hypermarket"></div>
+                <div class="body">
+                    <div class="name">Fresh Choice Hypermarket</div>
+                    <div class="loc" onclick="openGoogleMaps('Fresh+Choice+Hypermarket+Ahmedabad')" style="cursor: pointer;">📍 2.5 km · 20 mins</div>
+                    <div class="card-actions">
+                        <a href="javascript:void(0)" onclick="openGoogleMaps('Fresh+Choice+Hypermarket+Ahmedabad')" class="map-btn" title="Navigate via Google Maps"><i class="fa-solid fa-location-dot"></i></a>
+                        <span class="btn-view" onclick="window.location.href='index3.html'">View Shop →</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Store 8 -->
+            <div class="store-card">
+                <div class="store-image"><img src="https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=400&q=80" alt="Green Organic Store"></div>
+                <div class="body">
+                    <div class="name">Green Organic Store</div>
+                    <div class="loc" onclick="openGoogleMaps('Green+Organic+Store+Ahmedabad')" style="cursor: pointer;">📍 1.8 km · 14 mins</div>
+                    <div class="card-actions">
+                        <a href="javascript:void(0)" onclick="openGoogleMaps('Green+Organic+Store+Ahmedabad')" class="map-btn" title="Navigate via Google Maps"><i class="fa-solid fa-location-dot"></i></a>
+                        <span class="btn-view" onclick="window.location.href='index3.html'">View Shop →</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Store 9 -->
+            <div class="store-card">
+                <div class="store-image"><img src="https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400&q=80" alt="Quick Mart"></div>
+                <div class="body">
+                    <div class="name">Quick Mart</div>
+                    <div class="loc" onclick="openGoogleMaps('Quick+Mart+Ahmedabad')" style="cursor: pointer;">📍 0.5 km · 6 mins</div>
+                    <div class="card-actions">
+                        <a href="javascript:void(0)" onclick="openGoogleMaps('Quick+Mart+Ahmedabad')" class="map-btn" title="Navigate via Google Maps"><i class="fa-solid fa-location-dot"></i></a>
+                        <span class="btn-view" onclick="window.location.href='index3.html'">View Shop →</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Store 10 -->
+            <div class="store-card">
+                <div class="store-image"><img src="https://images.unsplash.com/photo-1604719311686-9c9d9c6b3e6b?w=400&q=80" alt="Value Bazaar"></div>
+                <div class="body">
+                    <div class="name">Value Bazaar</div>
+                    <div class="loc" onclick="openGoogleMaps('Value+Bazaar+Ahmedabad')" style="cursor: pointer;">📍 2.0 km · 16 mins</div>
+                    <div class="card-actions">
+                        <a href="javascript:void(0)" onclick="openGoogleMaps('Value+Bazaar+Ahmedabad')" class="map-btn" title="Navigate via Google Maps"><i class="fa-solid fa-location-dot"></i></a>
+                        <span class="btn-view" onclick="window.location.href='index3.html'">View Shop →</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Store 11 -->
+            <div class="store-card">
+                <div class="store-image"><img src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&q=80" alt="City Mart"></div>
+                <div class="body">
+                    <div class="name">City Mart</div>
+                    <div class="loc" onclick="openGoogleMaps('City+Mart+Ahmedabad')" style="cursor: pointer;">📍 1.9 km · 15 mins</div>
+                    <div class="card-actions">
+                        <a href="javascript:void(0)" onclick="openGoogleMaps('City+Mart+Ahmedabad')" class="map-btn" title="Navigate via Google Maps"><i class="fa-solid fa-location-dot"></i></a>
+                        <span class="btn-view" onclick="window.location.href='index3.html'">View Shop →</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Store 12 -->
+            <div class="store-card">
+                <div class="store-image"><img src="https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=400&q=80" alt="Farm Fresh Corner"></div>
+                <div class="body">
+                    <div class="name">Farm Fresh Corner</div>
+                    <div class="loc" onclick="openGoogleMaps('Farm+Fresh+Corner+Ahmedabad')" style="cursor: pointer;">📍 2.3 km · 18 mins</div>
+                    <div class="card-actions">
+                        <a href="javascript:void(0)" onclick="openGoogleMaps('Farm+Fresh+Corner+Ahmedabad')" class="map-btn" title="Navigate via Google Maps"><i class="fa-solid fa-location-dot"></i></a>
+                        <span class="btn-view" onclick="window.location.href='index3.html'">View Shop →</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <nav class="bottom-nav">
+        <div class="bottom-nav-inner">
+            <a href="index1.html" class="bottom-nav-item active"><span class="icon">🏠</span> Home</a>
+            <a href="#" class="bottom-nav-item"><span class="icon">📂</span> Categories</a>
+            <a href="#" class="bottom-nav-item"><span class="icon">📍</span> Nearby</a>
+            <a href="#" class="bottom-nav-item"><span class="icon">🏬</span> Stores</a>
+            <a href="#" class="bottom-nav-item"><span class="icon">👤</span> Profile</a>
+            <a href="index.html" class="bottom-nav-item"><span class="icon">🔐</span> Login</a>
+        </div>
+    </nav>
+
+    <script>
+        (function() {
+            var cartTotal = 0;
+            var quantities = {};
+
+            function updateBadge() {
+                var el = document.getElementById('cartBadge');
+                el.textContent = cartTotal;
+                el.classList.toggle('hidden', cartTotal === 0);
+            }
+
+            function updateCartTotal(delta) {
+                cartTotal = Math.max(0, cartTotal + delta);
+                updateBadge();
+            }
+
+            document.getElementById('productsGrid').addEventListener('click', function(e) {
+                var card = e.target.closest('.product-card');
+                if (!card) return;
+                var id = card.getAttribute('data-id');
+                var addBtn = card.querySelector('.add-btn');
+                var qtySel = card.querySelector('.qty-selector');
+                var qtyNum = card.querySelector('.qty-num');
+                var minusBtn = card.querySelector('.qty-selector .minus');
+                var plusBtn = card.querySelector('.qty-selector .plus');
+
+                if (e.target.closest('.product-img-wrap')) {
+                    var link = e.target.closest('.product-img-wrap').getAttribute('data-product-link');
+                    if (link) window.location.href = link;
+                    return;
+                }
+
+                if (e.target === addBtn || addBtn.contains(e.target)) {
+                    addBtn.style.display = 'none';
+                    qtySel.classList.add('visible');
+                    quantities[id] = 1;
+                    updateCartTotal(1);
+                    
+                    // Show offer notification when adding to cart
+                    var productName = card.querySelector('.name').textContent;
+                    showOfferNotification('Added to cart: ' + productName);
+                    return;
+                }
+
+                if (e.target === minusBtn) {
+                    var current = quantities[id] || 1;
+                    var q = current - 1;
+                    if (q <= 0) {
+                        quantities[id] = 0;
+                        qtySel.classList.remove('visible');
+                        addBtn.style.display = 'flex';
+                        updateCartTotal(-current);
+                        return;
+                    }
+                    quantities[id] = q;
+                    qtyNum.textContent = q;
+                    updateCartTotal(-1);
+                    return;
+                }
+
+                if (e.target === plusBtn) {
+                    var q = (quantities[id] || 0) + 1;
+                    quantities[id] = q;
+                    qtyNum.textContent = q;
+                    updateCartTotal(1);
+                }
+            });
+
+            document.querySelectorAll('.filter-tabs button').forEach(function(btn, i) {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-tabs button').forEach(function(b) { b.classList.remove('active'); });
+                    btn.classList.add('active');
+                });
+            });
+
+            // Show initial welcome offer notification
+            setTimeout(function() {
+                showOfferNotification('Welcome! Check out our latest offers on groceries!');
+            }, 1000);
+
+            // Show offer notification for products with offer badges
+            setTimeout(function() {
+                showOfferNotification('Special Offer: 15% OFF on Britannia Good Day biscuits!');
+            }, 3000);
+        })();
+
+        // Function to open Google Maps
+        function openGoogleMaps(query) {
+            var mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query);
+            window.open(mapsUrl, '_blank');
+        }
+
+        // Function to show notifications
+        function showOfferNotification(message) {
+            var container = document.getElementById('notificationContainer');
+            var notification = document.createElement('div');
+            notification.className = 'notification offer-notification';
+            
+            notification.innerHTML = `
+                <div class="notification-icon">🎁</div>
+                <div class="notification-content">
+                    <div class="notification-title">New Offer!</div>
+                    <div class="notification-message">${message}</div>
+                </div>
+                <div class="notification-close" onclick="this.parentElement.remove()">✕</div>
+            `;
+            
+            container.appendChild(notification);
+            
+            // Auto remove after 5 seconds
+            setTimeout(function() {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+
+        // Add click handlers for location elements
+        document.addEventListener('DOMContentLoaded', function() {
+            // Make all location spans clickable
+            document.querySelectorAll('.loc').forEach(function(el) {
+                el.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    var text = this.textContent.trim();
+                    // Extract store/product name from location text
+                    var query = text.replace(/[📍🕐\d\s.kmmin]+/g, '').trim();
+                    if (query) {
+                        openGoogleMaps(query + ' Ahmedabad');
+                    } else {
+                        // If no specific name, use parent store name
+                        var storeName = this.closest('.store-card')?.querySelector('.name')?.textContent;
+                        if (storeName) {
+                            openGoogleMaps(storeName + ' Ahmedabad');
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

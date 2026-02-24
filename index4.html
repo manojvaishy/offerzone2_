@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OfferZone · Admin Dashboard</title>
+  <!-- Poppins font & Font Awesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #f5f7fa;
+      color: #1e293b;
+      line-height: 1.5;
+      padding-bottom: 80px; /* for bottom nav */
+    }
+
+    /* orange theme */
+    :root {
+      --primary: #FF6B00;
+      --primary-light: #ff8c33;
+      --primary-soft: #fff2e5;
+      --gray-bg: #f8fafc;
+      --card-shadow: 0 8px 20px rgba(0,0,0,0.02), 0 2px 6px rgba(0,0,0,0.03);
+      --card-hover: 0 16px 30px rgba(255,107,0,0.08), 0 6px 12px rgba(0,0,0,0.05);
+      --radius-card: 14px;
+      --radius-input: 10px;
+    }
+
+    /* navbar */
+    .navbar {
+      background: white;
+      padding: 0.75rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 700;
+      font-size: 1.5rem;
+    }
+    .logo i { color: var(--primary); font-size: 1.8rem; }
+    .logo span span:first-child { color: var(--primary); }
+    .logo span span:last-child { color: #1e293b; }
+
+    .nav-menu {
+      display: flex;
+      gap: 2rem;
+      font-weight: 500;
+    }
+    .nav-menu a {
+      text-decoration: none;
+      color: #334155;
+      transition: color 0.2s;
+    }
+    .nav-menu a:hover { color: var(--primary); }
+
+    .nav-icons {
+      display: flex;
+      gap: 1.2rem;
+      align-items: center;
+    }
+    .nav-icons i {
+      font-size: 1.3rem;
+      color: #475569;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .nav-icons i:hover { color: var(--primary); }
+    .cart-link {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      color: #475569;
+    }
+    .cart-link:hover i { color: var(--primary); }
+    .cart-badge {
+      position: absolute;
+      top: -6px;
+      right: -8px;
+      background: #e11d48;
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 600;
+      min-width: 16px;
+      height: 16px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .profile-icon {
+      width: 38px;
+      height: 38px;
+      background: var(--primary-soft);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    /* layout */
+    .admin-container {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 2rem 2rem 1rem;
+    }
+
+    /* hero */
+    .hero-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+    .hero-text h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .hero-text p {
+      color: #475569;
+      margin-top: 0.25rem;
+    }
+    .btn-primary {
+      background: linear-gradient(145deg, var(--primary), #ff8533);
+      border: none;
+      color: white;
+      font-weight: 600;
+      padding: 0.9rem 2rem;
+      border-radius: 14px;
+      font-size: 1rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      cursor: pointer;
+      box-shadow: 0 6px 14px rgba(255,107,0,0.25);
+      transition: all 0.25s ease;
+    }
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 22px rgba(255,107,0,0.35);
+    }
+    .btn-primary:active { transform: translateY(0); }
+    .hero-illus i { font-size: 4rem; color: var(--primary); }
+
+    /* tabs */
+    .tabs-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 2rem 0 1.8rem;
+    }
+    .tab-group {
+      display: flex;
+      gap: 1rem;
+    }
+    .tab {
+      background: transparent;
+      border: none;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 0.6rem 1.2rem;
+      border-radius: 30px;
+      color: #475569;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .tab.active {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 6px 12px rgba(255,107,0,0.2);
+    }
+    .tab:hover:not(.active) { background: #e9eaeb; }
+    .action-icons i {
+      font-size: 1.2rem;
+      margin-left: 1rem;
+      color: #5f6b7a;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .action-icons i:hover { color: var(--primary); }
+
+    /* main two columns */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    /* cards */
+    .card {
+      background: white;
+      border-radius: var(--radius-card);
+      padding: 1.8rem 1.8rem 2rem;
+      box-shadow: var(--card-shadow);
+      transition: box-shadow 0.3s ease, transform 0.2s;
+      margin-bottom: 2rem;
+    }
+    .card:hover {
+      box-shadow: var(--card-hover);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    .card-header h3 {
+      font-weight: 700;
+      font-size: 1.3rem;
+    }
+    .badge-step {
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-weight: 600;
+      padding: 0.3rem 1rem;
+      border-radius: 30px;
+      font-size: 0.8rem;
+    }
+
+    /* progress (0/1 complete) */
+    .progress-indicator {
+      font-size: 0.9rem;
+      color: #64748b;
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .progress-indicator span {
+      background: #e9eaeb;
+      border-radius: 20px;
+      padding: 0.2rem 0.8rem;
+      color: #1e293b;
+      font-weight: 500;
+    }
+
+    /* upload area */
+    .upload-photo {
+      border: 2px dashed #cbd5e1;
+      border-radius: var(--radius-input);
+      padding: 1.8rem 1rem;
+      text-align: center;
+      color: #64748b;
+      margin-bottom: 1.5rem;
+      cursor: pointer;
+      transition: border 0.2s, background 0.2s;
+      position: relative;
+    }
+    .upload-photo i { font-size: 2.2rem; color: var(--primary); margin-bottom: 0.5rem; }
+    .upload-photo:hover { border-color: var(--primary); background: #fffaf5; }
+    .upload-photo.dragover {
+      border-color: var(--primary);
+      background: #fffaf5;
+    }
+    .upload-photo input[type=\"file\"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    /* form rows */
+    .form-row {
+      margin-bottom: 1.5rem;
+    }
+    label {
+      font-weight: 500;
+      font-size: 0.9rem;
+      color: #334155;
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+    .required:after {
+      content: " *";
+      color: #dc2626;
+    }
+    input, select {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius-input);
+      font-family: inherit;
+      font-size: 0.95rem;
+      background: white;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.01);
+      transition: border 0.2s, box-shadow 0.2s;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(255,107,0,0.15), inset 0 2px 4px rgba(0,0,0,0.02);
+    }
+    .input-hint {
+      font-size: 0.8rem;
+      color: #6b7280;
+      margin-top: 0.25rem;
+    }
+    .barcode-row {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    .barcode-row input { flex: 1; }
+    .btn-outline {
+      background: white;
+      border: 1px solid #d1d5db;
+      padding: 0.75rem 1.2rem;
+      border-radius: var(--radius-input);
+      font-weight: 500;
+      color: #374151;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-outline:hover {
+      background: #f3f4f6;
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    /* pricing card */
+    .price-grid {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .price-grid .form-row { flex: 1 1 200px; }
+    .discount-badge {
+      background: #dcfce7;
+      color: #166534;
+      font-weight: 600;
+      padding: 0.35rem 1rem;
+      border-radius: 30px;
+      display: inline-block;
+      font-size: 0.9rem;
+    }
+    .saving-message {
+      background: #f1f5f9;
+      padding: 0.8rem 1.2rem;
+      border-radius: 10px;
+      margin: 1rem 0 1.5rem;
+      font-weight: 500;
+    }
+    .saving-message i { color: var(--primary); margin-right: 0.5rem; }
+    .error-message {
+      color: #dc2626;
+      font-size: 0.8rem;
+      margin-top: 0.3rem;
+      display: none;
+    }
+    .error-message.visible { display: block; }
+
+    /* quick tips card */
+    .quick-tips-card {
+      background: white;
+      border-radius: var(--radius-card);
+      padding: 1.8rem;
+      box-shadow: var(--card-shadow);
+      transition: box-shadow 0.3s;
+    }
+    .quick-tips-card:hover { box-shadow: var(--card-hover); }
+    .quick-tips-card h4 {
+      font-size: 1.2rem;
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .quick-tips-card h4 i { color: var(--primary); }
+    .quick-tips-card ul {
+      list-style: none;
+    }
+    .quick-tips-card li {
+      padding: 0.7rem 0;
+      border-bottom: 1px solid #edf2f7;
+      display: flex;
+      gap: 0.8rem;
+      align-items: flex-start;
+    }
+    .quick-tips-card li i {
+      color: var(--primary);
+      font-size: 1.1rem;
+      margin-top: 0.2rem;
+    }
+    .quick-tips-card li:last-child { border: none; }
+
+    /* bottom mobile nav */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.04);
+      padding: 0.6rem 1rem;
+      display: none;
+      justify-content: space-around;
+      z-index: 20;
+    }
+    .bottom-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #64748b;
+      font-size: 0.75rem;
+      transition: color 0.2s;
+      cursor: pointer;
+    }
+    .bottom-nav-item i { font-size: 1.3rem; margin-bottom: 0.2rem; }
+    .bottom-nav-item.active { color: var(--primary); }
+
+    @media (max-width: 900px) {
+      .dashboard-grid { grid-template-columns: 1fr; }
+      .nav-menu { display: none; }
+      .bottom-nav { display: flex; }
+      .navbar { padding: 0.75rem 1rem; }
+    }
+    @media (max-width: 600px) {
+      .hero-row { flex-direction: column; align-items: start; gap: 1rem; }
+      .admin-container { padding: 1.5rem 1rem; }
+    }
+
+    /* validation visual */
+    input.error, select.error {
+      border-color: #dc2626;
+      background-color: #fff5f5;
+    }
+    .field-error {
+      color: #dc2626;
+      font-size: 0.75rem;
+      margin-top: 0.2rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- navbar -->
+  <header class="navbar">
+    <div class="logo">
+      <i class="fas fa-store"></i>
+      <span><span>Offer</span><span>Zone</span></span>
+    </div>
+    <div class="nav-menu">
+      <a href="#">Home</a>
+      <a href="#">Categories</a>
+      <a href="#">Nearby Stores</a>
+    </div>
+    <div class="nav-icons">
+      <a href="index3.html" class="cart-link">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="cart-badge">3</span>
+      </a>
+      <i class="far fa-bell"></i>
+      <div class="profile-icon"><i class="far fa-user"></i></div>
+    </div>
+  </header>
+
+  <main class="admin-container">
+    <!-- hero -->
+    <div class="hero-row">
+      <div class="hero-text">
+        <h1>Manage Your Shop Products</h1>
+        <p>Easily manage the products in your shop and add new items.</p>
+      </div>
+      <button class="btn-primary"><i class="fas fa-plus-circle"></i> Add New Product</button>
+      <div class="hero-illus"><i class="fas fa-shopping-bag"></i></div>
+    </div>
+
+    <!-- tabs -->
+    <div class="tabs-bar">
+      <div class="tab-group">
+        <button class="tab active">All Products</button>
+        <button class="tab">Low Stock</button>
+      </div>
+      <div class="action-icons">
+        <i class="fas fa-sliders-h"></i>
+        <i class="fas fa-search"></i>
+      </div>
+    </div>
+
+    <!-- main grid -->
+    <div class="dashboard-grid">
+      <!-- left column: forms -->
+      <div>
+        <!-- product info card -->
+        <div class="card" id="productInfoCard">
+          <div class="card-header">
+            <h3>Add New Product · Product Information</h3>
+            <span class="badge-step">Step 1/3</span>
+          </div>
+          <div class="progress-indicator">
+            <span>0/1 Complete</span> <i class="far fa-clock"></i>
+          </div>
+
+          <!-- upload placeholder -->
+          <div class="upload-photo" id="uploadArea">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <p id="uploadLabel">Upload Product Photo (click or drag)</p>
+            <input type="file" id="productImage" accept="image/*">
+          </div>
+
+          <!-- product name -->
+          <div class="form-row" data-required="name">
+            <label class="required">Product Name</label>
+            <input type="text" id="productName" placeholder="e.g., Britannia, Amul, Tata" value="Parlesh Biscuits">
+            <div class="field-error" id="error-name"></div>
+          </div>
+
+          <!-- category -->
+          <div class="form-row" data-required="category">
+            <label class="required">Category</label>
+            <select id="category">
+              <option value="Snacks" selected>Snacks</option>
+              <option value="Staples">Staples</option>
+              <option value="Beverages">Beverages</option>
+              <option value="Dairy">Dairy</option>
+              <option value="Personal Care">Personal Care</option>
+            </select>
+            <div class="field-error" id="error-category"></div>
+          </div>
+
+          <!-- weight / size -->
+          <div class="form-row" data-required="weight">
+            <label class="required">Weight / Size</label>
+            <input type="text" id="weight" placeholder="e.g., 200 g, 1 L" value="200 g">
+            <div class="field-error" id="error-weight"></div>
+          </div>
+
+          <!-- barcode with auto-generate -->
+          <div class="form-row">
+            <label>Barcode</label>
+            <div class="barcode-row">
+              <input type="text" id="barcode" placeholder="Auto‑generate if left blank" value="890123456789">
+              <button class="btn-outline" type="button" id="genBarcode"><i class="fas fa-sync-alt"></i> Generate</button>
+            </div>
+            <div class="input-hint"><i class="far fa-lightbulb"></i> Auto‑generate if left blank</div>
+          </div>
+
+          <!-- next button (just scroll / visual) -->
+          <button class="btn-primary" id="nextToPricing" style="margin-top: 0.5rem;"><i class="fas fa-arrow-right"></i> Next: Pricing ></button>
+        </div>
+
+        <!-- pricing card -->
+        <div class="card" id="pricingCard">
+          <div class="card-header">
+            <h3>Set Pricing</h3>
+            <span class="badge-step">Step 2/3</span>
+          </div>
+          <div class="price-grid">
+            <div class="form-row" data-required="mrp">
+              <label class="required">MRP (₹)</label>
+              <input type="number" id="mrp" value="12" min="0" step="0.01">
+              <div class="field-error" id="error-mrp"></div>
+            </div>
+            <div class="form-row" data-required="selling">
+              <label class="required">Selling Price (₹)</label>
+              <input type="number" id="selling" value="10" min="0" step="0.01">
+              <div class="field-error" id="error-selling"></div>
+            </div>
+            <div class="form-row">
+              <label>Discount %</label>
+              <div class="discount-badge" id="discountDisplay">16%</div>
+            </div>
+          </div>
+
+          <!-- you save message + validation error -->
+          <div class="saving-message" id="savingMsg">
+            <i class="fas fa-tag"></i> You save: ₹2 (16% off)
+          </div>
+          <div id="priceError" class="error-message" style="margin-bottom: 0.8rem;">Selling price must be less than MRP</div>
+
+          <p style="font-size:0.9rem; color:#475569; margin-bottom:1.5rem;"><i class="far fa-info-circle"></i> This is the price customers will pay in your shop.</p>
+
+          <!-- save product button with validation -->
+          <button class="btn-primary" id="saveProductBtn"><i class="fas fa-save"></i> Save Product</button>
+        </div>
+      </div>
+
+      <!-- right column: quick tips -->
+      <div>
+        <div class="quick-tips-card">
+          <h4><i class="fas fa-bolt"></i> Quick Tips</h4>
+          <ul>
+            <li><i class="fas fa-camera"></i> Scan the barcode to auto‑fill product details.</li>
+            <li><i class="fas fa-image"></i> Use clear, high‑quality product images.</li>
+            <li><i class="fas fa-boxes"></i> Always keep stock updated to prevent issues.</li>
+            <li><i class="fas fa-chart-line"></i> Set low stock alerts to manage inventory effectively.</li>
+            <li><i class="fas fa-tag"></i> Keep selling price below MRP for better trust.</li>
+          </ul>
+        </div>
+        <!-- extra tip card (optional, matches description) -->
+        <div style="margin-top: 1.5rem; background: #fff2e5; border-radius: 14px; padding: 1rem;">
+          <p style="display:flex; gap:0.8rem;"><i class="fas fa-barcode" style="color:var(--primary);"></i> <span>Quick Tip: Scan the product barcode to auto‑fill details</span></p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- bottom mobile nav -->
+  <nav class="bottom-nav">
+    <div class="bottom-nav-item active"><i class="fas fa-home"></i> Home</div>
+    <div class="bottom-nav-item"><i class="fas fa-th-large"></i> Cats</div>
+    <div class="bottom-nav-item"><i class="fas fa-store"></i> Stores</div>
+    <div class="bottom-nav-item"><i class="fas fa-bell"></i> Alerts</div>
+    <div class="bottom-nav-item"><i class="fas fa-user"></i> Profile</div>
+  </nav>
+
+  <script>
+    (function() {
+      // DOM elements
+      const mrpInput = document.getElementById('mrp');
+      const sellingInput = document.getElementById('selling');
+      const discountDisplay = document.getElementById('discountDisplay');
+      const savingMsg = document.getElementById('savingMsg');
+      const priceErrorDiv = document.getElementById('priceError');
+      const genBarcodeBtn = document.getElementById('genBarcode');
+      const barcodeInput = document.getElementById('barcode');
+      const saveBtn = document.getElementById('saveProductBtn');
+      const nextBtn = document.getElementById('nextToPricing');
+
+      // upload elements
+      const uploadArea = document.getElementById('uploadArea');
+      const uploadInput = document.getElementById('productImage');
+      const uploadLabel = document.getElementById('uploadLabel');
+
+      // required fields
+      const productName = document.getElementById('productName');
+      const category = document.getElementById('category');
+      const weight = document.getElementById('weight');
+      const mrp = document.getElementById('mrp');
+      const selling = document.getElementById('selling');
+
+      // error spans
+      const errorName = document.getElementById('error-name');
+      const errorCategory = document.getElementById('error-category');
+      const errorWeight = document.getElementById('error-weight');
+      const errorMrp = document.getElementById('error-mrp');
+      const errorSelling = document.getElementById('error-selling');
+
+      // helper to clear errors
+      function clearErrors() {
+        [errorName, errorCategory, errorWeight, errorMrp, errorSelling].forEach(e => e.innerHTML = '');
+        [productName, category, weight, mrp, selling].forEach(el => el.classList.remove('error'));
+        priceErrorDiv.classList.remove('visible');
+      }
+
+      // image upload handlers
+      if (uploadArea && uploadInput) {
+        uploadArea.addEventListener('click', function () {
+          uploadInput.click();
+        });
+
+        uploadInput.addEventListener('change', function () {
+          if (uploadInput.files && uploadInput.files[0]) {
+            uploadLabel.textContent = uploadInput.files[0].name;
+          } else {
+            uploadLabel.textContent = 'Upload Product Photo (click or drag)';
+          }
+        });
+
+        uploadArea.addEventListener('dragover', function (e) {
+          e.preventDefault();
+          uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', function (e) {
+          e.preventDefault();
+          uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', function (e) {
+          e.preventDefault();
+          uploadArea.classList.remove('dragover');
+          if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+            uploadInput.files = e.dataTransfer.files;
+            uploadLabel.textContent = uploadInput.files[0].name;
+          }
+        });
+      }
+
+      // validate required fields (except barcode)
+      function validateRequired() {
+        let isValid = true;
+        clearErrors();
+
+        if (!productName.value.trim()) {
+          errorName.innerHTML = 'Product name is required';
+          productName.classList.add('error');
+          isValid = false;
+        }
+        if (!category.value) {
+          errorCategory.innerHTML = 'Please select a category';
+          category.classList.add('error');
+          isValid = false;
+        }
+        if (!weight.value.trim()) {
+          errorWeight.innerHTML = 'Weight / size is required';
+          weight.classList.add('error');
+          isValid = false;
+        }
+        if (!mrp.value || parseFloat(mrp.value) <= 0) {
+          errorMrp.innerHTML = 'Valid MRP required';
+          mrp.classList.add('error');
+          isValid = false;
+        }
+        if (!selling.value || parseFloat(selling.value) <= 0) {
+          errorSelling.innerHTML = 'Valid selling price required';
+          selling.classList.add('error');
+          isValid = false;
+        }
+        return isValid;
+      }
+
+      // update discount & saving, also check selling <= mrp
+      function updatePricing() {
+        const m = parseFloat(mrpInput.value) || 0;
+        const s = parseFloat(sellingInput.value) || 0;
+
+        if (m > 0 && s > 0 && s <= m) {
+          const discount = ((m - s) / m * 100).toFixed(1);
+          const save = (m - s).toFixed(2);
+          discountDisplay.textContent = discount + '%';
+          savingMsg.innerHTML = `<i class="fas fa-tag"></i> You save: ₹${save} (${discount}% off)`;
+          priceErrorDiv.classList.remove('visible');
+        } else {
+          discountDisplay.textContent = '0%';
+          savingMsg.innerHTML = `<i class="fas fa-tag"></i> You save: ₹0 (0% off)`;
+          if (m > 0 && s > 0 && s > m) {
+            priceErrorDiv.classList.add('visible');
+          } else {
+            priceErrorDiv.classList.remove('visible');
+          }
+        }
+      }
+
+      mrpInput.addEventListener('input', updatePricing);
+      sellingInput.addEventListener('input', updatePricing);
+      updatePricing(); // initial
+
+      // generate random barcode (12 digit)
+      genBarcodeBtn.addEventListener('click', function() {
+        const random = Math.floor(100000000000 + Math.random() * 900000000000).toString();
+        barcodeInput.value = random;
+      });
+
+      // save product with full validation
+      saveBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const requiredOk = validateRequired();
+        if (!requiredOk) return;
+
+        const m = parseFloat(mrpInput.value) || 0;
+        const s = parseFloat(sellingInput.value) || 0;
+        if (s >= m) {
+          priceErrorDiv.classList.add('visible');
+          selling.classList.add('error');
+          return;
+        }
+
+        // if barcode empty, generate one
+        if (!barcodeInput.value.trim()) {
+          genBarcodeBtn.click();
+        }
+
+        alert('✅ Product saved successfully (demo)');
+      });
+
+      // next button (simple validation for product info)
+      nextBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        let ok = true;
+        if (!productName.value.trim()) {
+          errorName.innerHTML = 'Product name required';
+          productName.classList.add('error'); ok = false;
+        } else { errorName.innerHTML = ''; productName.classList.remove('error'); }
+
+        if (!category.value) {
+          errorCategory.innerHTML = 'Category required';
+          category.classList.add('error'); ok = false;
+        } else { errorCategory.innerHTML = ''; category.classList.remove('error'); }
+
+        if (!weight.value.trim()) {
+          errorWeight.innerHTML = 'Weight required';
+          weight.classList.add('error'); ok = false;
+        } else { errorWeight.innerHTML = ''; weight.classList.remove('error'); }
+
+        if (ok) {
+          document.getElementById('pricingCard').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      });
+
+      // minor: if selling > mrp, live validation style
+      sellingInput.addEventListener('blur', function() {
+        const m = parseFloat(mrpInput.value) || 0;
+        const s = parseFloat(sellingInput.value) || 0;
+        if (m && s && s >= m) {
+          selling.classList.add('error');
+          priceErrorDiv.classList.add('visible');
+        } else {
+          selling.classList.remove('error');
+          priceErrorDiv.classList.remove('visible');
+        }
+      });
+
+      // optional: generate barcode on page load if empty
+      if (!barcodeInput.value) genBarcodeBtn.click();
+
+      // tab switching (visual only)
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+          this.classList.add('active');
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
